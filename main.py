@@ -709,7 +709,7 @@ class Joc:
                 nr +=1
         return nr == 3
 
-    def estimeazaScor(self,adancime):   #?
+    def estimeazaScor2(self,adancime):   #?
         tFinal = self.final()
         if tFinal == self.__class__.JMAX:  # self.__class__ referinta catre clasa instantei
             return (99 + adancime)
@@ -719,6 +719,20 @@ class Joc:
             return 0
         else:
             return (self.linColDeschise(self.__class__.JMAX) - self.linColDeschise(self.__class__.JMIN))
+
+    def estimeazaScor(self,adancime):   #?
+        tFinal = self.final()
+        if tFinal == self.__class__.JMAX:  # self.__class__ referinta catre clasa instantei
+            return (9999 + adancime)
+        elif tFinal == self.__class__.JMIN:
+            return (-9999 - adancime)
+        elif tFinal == 'remiza':
+            return 0
+        else:
+            if self.etapa == 2:
+                return self.nrPiese(self.__class__.JMAX) - self.nrPiese(self.__class__.JMIN)
+            else:
+                return self.nrPiese(self.__class__.JMAX) - self.nrPiese(self.__class__.JMIN)
 
 
     def sirAfisare(self):
