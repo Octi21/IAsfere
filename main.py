@@ -12,7 +12,7 @@ import pygame
 # | . - . - . |
 # . - - . - - .
 
-adancimeMax = 4
+adancimeMax = 3
 
 def createTable():
     l = []
@@ -629,6 +629,14 @@ class Joc:
 
         return l_matrice
 
+    # returneaza pozitiile unde sunt locuri libere '.'
+    def locLiber(self):
+        l = []
+        for i in range(self.lungime):
+            for j in range(self.lungime):
+                if self.matr[i][j] == '.':
+                    l.append([i,j])
+        return l
 
     def mutari(self, jucator):  # jucator = simbolul jucatorului care muta
         if self.etapa == 1:
@@ -647,7 +655,7 @@ class Joc:
 
             return l_mutari
 
-        if self.etapa == 2:
+        if self.etapa == 2 and self.nrPiese(jucator) > 3:
             l_mutari = []
             for i in range(self.lungime):
                 for j in range(self.lungime):
@@ -665,7 +673,33 @@ class Joc:
                                     for matrice in ceva:
                                         l_mutari.append(Joc(matrice))
 
-            return l_mutari
+
+        elif self.etapa == 2 and self.nrPiese(jucator) <= 3:
+            l_mutari = []
+            for i in range(self.lungime):
+                for j in range(self.lungime):
+                    if self.matr[i][j] == jucator:
+                        listaPoz = self.locLiber()
+                        for elem in listaPoz:
+                            copie_matr = copy.deepcopy(self.matr)
+                            copie_matr[i][j] = '.'
+                            copie_matr[elem[0]][elem[1]] = jucator
+                            if self.contineLinCol(elem[0], elem[1], copie_matr) == False:
+                                l_mutari.append(Joc(copie_matr))
+                            else:  # daca elem mutat a creat o linie full (trebuie stearsa o piesa)
+                                ceva = self.stergeElement(copie_matr, self.jucator_opus(jucator))
+                                for matrice in ceva:
+                                    l_mutari.append(Joc(matrice))
+
+        return l_mutari
+        # . - - . - - .
+        # | . - . - . |
+        # | | . . . | |
+        # . . . _ . . .
+        # | | . . . | |
+        # | . - . - . |
+        # . - - . - - .
+
 
 
     def nrPiese(self,jucator):  # jucator = simbolul jucatorului care muta
@@ -812,6 +846,50 @@ def min_max(stare):
     return stare
 
 
+def alpha_beta(alpha, beta, stare):
+    if stare.adancime == 0 or stare.tablaJoc.final():
+        stare.estimare = stare.tablaJoc.estimeazaScor(stare.adancime)
+        return stare
+
+    if alpha > beta:
+        return stare  # este intr-un interval invalid deci nu o mai procesez
+
+    stare.mutariPosibile = stare.mutari()
+
+    if stare.jucatorCurent == Joc.JMAX:
+        estimare_curenta = float('-inf')  # in aceasta variabila calculam maximul
+
+        for mutare in stare.mutariPosibile:
+            # calculeaza estimarea pentru starea noua, realizand subarborele
+            stare_noua = alpha_beta(alpha, beta, mutare)  # aici construim subarborele pentru stare_noua
+
+            if (estimare_curenta < stare_noua.estimare):
+                stare.stareAleasa = stare_noua
+                estimare_curenta = stare_noua.estimare
+            if (alpha < stare_noua.estimare):
+                alpha = stare_noua.estimare
+                if alpha >= beta:  # interval invalid
+                    break
+
+    elif stare.jucatorCurent == Joc.JMIN:
+        estimare_curenta = float('inf')
+        # completati cu rationament similar pe cazul stare.j_curent==Joc.JMAX
+        for mutare in stare.mutariPosibile:
+            # calculeaza estimarea
+            stare_noua = alpha_beta(alpha, beta, mutare)  # aici construim subarborele pentru stare_noua
+
+            if (estimare_curenta > stare_noua.estimare):
+                stare.stareAleasa = stare_noua
+                estimare_curenta = stare_noua.estimare
+            if (beta > stare_noua.estimare):
+                beta = stare_noua.estimare
+                if alpha >= beta:
+                    break
+
+    stare.estimare = stare.stareAleasa.estimare
+
+    return stare
+
 
 def afis_daca_final(stare_curenta):
     final = stare_curenta.tablaJoc.final()  # metoda final() returneaza "remiza" sau castigatorul ("x" sau "0") sau False daca nu e stare finala
@@ -933,8 +1011,8 @@ def main():
                 # stare actualizata e starea mea curenta in care am setat stare_aleasa (mutarea urmatoare)
                 if tip_algoritm == '1':
                     stare_actualizata = min_max(stareC)
-                # else:  # tip_algoritm==2
-                #     stare_actualizata = alpha_beta(-500, 500, stare_curenta)
+                else:  # tip_algoritm==2
+                    stare_actualizata = alpha_beta(-500, 500, stareC)
                 stareC.tablaJoc = stare_actualizata.stareAleasa.tablaJoc  # aici se face de fapt mutarea !!!
                 print("Tabla dupa mutarea calculatorului")
                 print(str(stareC))
@@ -985,7 +1063,10 @@ def main():
                 # gasit piesa de mutat
 
                 ## aici trebuie sa afisezi unde poate fi mutata piesa
-                print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.undePotiMuta(linie,coloana)))
+                if stareC.tablaJoc.nrPieseMin > 3:
+                    print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.undePotiMuta(linie,coloana)))
+                elif stareC.tablaJoc.nrPieseMin == 3:
+                    print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.locLiber()))
                 print("Alege unde")
                 raspunsV = False
                 while not raspunsV:
@@ -993,7 +1074,9 @@ def main():
                         linie2 = int(input("linie="))
                         coloana2 = int(input("coloana="))
                         if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
-                            if (linie2,coloana2) in stareC.tablaJoc.undePotiMuta(linie,coloana):
+                            if stareC.tablaJoc.nrPieseMin > 3 and (linie2,coloana2) in stareC.tablaJoc.undePotiMuta(linie,coloana):
+                                raspunsV = True
+                            elif stareC.tablaJoc.nrPieseMin <= 3 and [linie2,coloana2] in stareC.tablaJoc.locLiber():
                                 raspunsV = True
                             else:
                                 print("nu e o pozitie valida")
@@ -1014,14 +1097,24 @@ def main():
                             if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i,j,stareC.tablaJoc.matr):
                                 listaOpt.append([i, j])
                     print("Alege sa stergi una din piesele adversarului:")
-                    print(listaOpt)
+                    if stareC.tablaJoc.nrPieseMax > 3:
+                        print(listaOpt)
+                    elif stareC.tablaJoc.nrPieseMax == 3:
+                        listaOpt = []
+                        for i in range(7):
+                            for j in range(7):
+                                if stareC.tablaJoc.matr[i][j] == Joc.JMAX:
+                                    listaOpt.append([i, j])
+                        print(listaOpt)
+
                     raspunsV = False
                     while not raspunsV:
                         try:
                             linie2 = int(input("linie="))
                             coloana2 = int(input("coloana="))
                             if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
-                                if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
+                                # if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
+                                if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and [linie2,coloana2] in listaOpt:
                                     raspunsV = True
                                 else:
                                     print("Aici nu se poate pune piesa")
@@ -1048,6 +1141,10 @@ def main():
                 # S-a realizat o mutare. Schimb jucatorul cu cel opus
                 stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
 
+                ## nu stiu dc faci asa nu o sa mint
+                # print("Nr piese jucatorii ::    min = " + str(Joc.nrPieseMin) + "::    max = " + str(Joc.nrPieseMax))
+                print("Nr piese jucatorii ::    min = " + str(stareC.tablaJoc.nrPieseMin) + "::    max = " + str(stareC.tablaJoc.nrPieseMax))
+
             # . - - . - - .
             # | . - . - . |
             # | | . . . | |
@@ -1063,8 +1160,8 @@ def main():
                 # stare actualizata e starea mea curenta in care am setat stare_aleasa (mutarea urmatoare)
                 if tip_algoritm == '1':
                     stare_actualizata = min_max(stareC)
-                # else:  # tip_algoritm==2
-                #     stare_actualizata = alpha_beta(-500, 500, stare_curenta)
+                else:  # tip_algoritm==2
+                    stare_actualizata = alpha_beta(-500, 500, stareC)
                 stareC.tablaJoc = stare_actualizata.stareAleasa.tablaJoc  # aici se face de fapt mutarea !!!
                 print("Tabla dupa mutarea calculatorului")
                 print(str(stareC))
