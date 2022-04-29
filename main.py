@@ -2,6 +2,8 @@
 import copy
 import time
 import pygame
+import sys
+import math
 
 
 # . - - . - - .
@@ -13,6 +15,15 @@ import pygame
 # . - - . - - .
 
 adancimeMax = 3
+
+culoareEcran = (255, 255, 255)
+culoareLinii = (0, 0, 0)
+
+def distEuclid(p0,p1):
+    (x0,y0)=p0
+    (x1,y1)=p1
+    return math.sqrt((x0-x1)**2+(y0-y1)**2)
+
 
 def createTable():
     l = []
@@ -38,6 +49,12 @@ class Joc:
     piesePuseMin = 0
     piesePuseMax = 0
 
+    scalare = 100
+    translatie = 20
+    razaPct = 10
+    razaPiesa = 20
+    noduri = []
+    muchii =[]
 
     def __init__(self, tabla=None):  # Joc()
         self.matr = tabla or Joc.tbla
@@ -55,397 +72,6 @@ class Joc:
             print("Tu castigi")
             return self.JMIN
         return False
-
-
-    def mutari2(self, jucator):  # jucator = simbolul jucatorului care muta
-        if self.etapa == 1:
-            l_mutari = []
-            for i in range(self.lungime):
-                for j in range(self.lungime):
-                    if self.matr[i][j] == '.':
-                        copie_matr = copy.deepcopy(self.matr)
-                        copie_matr[i][j] = jucator
-                        l_mutari.append(Joc(copie_matr))
-            return l_mutari
-
-        if self.etapa == 2:
-            l_mutari = []
-            #layer1 colturi
-            if self.matr[0][0] == jucator:
-                if self.matr[0][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][3] = jucator
-                    copie_matr[0][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][0] = jucator
-                    copie_matr[0][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[0][6] == jucator:
-                if self.matr[0][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][3] = jucator
-                    copie_matr[0][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][6] = jucator
-                    copie_matr[0][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[6][6] == jucator:
-                if self.matr[6][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][3] = jucator
-                    copie_matr[6][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][6] = jucator
-                    copie_matr[6][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[6][0] == jucator:
-                if self.matr[0][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][3] = jucator
-                    copie_matr[6][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[6][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][3] = jucator
-                    copie_matr[6][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            # layer1 mijloc
-            if self.matr[0][3] == jucator:
-                if self.matr[0][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][0] = jucator
-                    copie_matr[0][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[0][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][6] = jucator
-                    copie_matr[0][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][3] = jucator
-                    copie_matr[0][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][0] == jucator:
-                if self.matr[0][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][0] = jucator
-                    copie_matr[3][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[6][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][0] = jucator
-                    copie_matr[3][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][1] = jucator
-                    copie_matr[3][0] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[6][3] == jucator:
-                if self.matr[6][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][6] = jucator
-                    copie_matr[6][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[6][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][0] = jucator
-                    copie_matr[6][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[5][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][3] = jucator
-                    copie_matr[6][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][6] == jucator:
-                if self.matr[6][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][6] = jucator
-                    copie_matr[3][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[0][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][6] = jucator
-                    copie_matr[3][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][5] = jucator
-                    copie_matr[3][6] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            # layer2 colturi
-            if self.matr[1][1] == jucator:
-                if self.matr[1][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][3] = jucator
-                    copie_matr[1][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][1] = jucator
-                    copie_matr[1][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[1][5] == jucator:
-                if self.matr[1][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][3] = jucator
-                    copie_matr[1][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][5] = jucator
-                    copie_matr[1][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[5][5] == jucator:
-                if self.matr[5][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][3] = jucator
-                    copie_matr[5][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][5] = jucator
-                    copie_matr[5][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[5][1] == jucator:
-                if self.matr[5][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][3] = jucator
-                    copie_matr[5][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][1] = jucator
-                    copie_matr[5][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            # layer2 mijloc
-            if self.matr[1][3] == jucator:
-                if self.matr[0][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[0][3] = jucator
-                    copie_matr[1][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[2][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][3] = jucator
-                    copie_matr[1][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][1] = jucator
-                    copie_matr[1][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][5] = jucator
-                    copie_matr[1][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][1] == jucator:
-                if self.matr[3][0] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][0] = jucator
-                    copie_matr[3][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][2] = jucator
-                    copie_matr[3][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][1] = jucator
-                    copie_matr[3][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[5][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][1] = jucator
-                    copie_matr[3][1] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[5][3] == jucator:
-                if self.matr[4][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][3] = jucator
-                    copie_matr[5][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[6][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[6][1] = jucator
-                    copie_matr[5][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[5][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][5] = jucator
-                    copie_matr[5][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[5][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][1] = jucator
-                    copie_matr[5][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][5] == jucator:
-                if self.matr[3][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][4] = jucator
-                    copie_matr[3][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][6] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][6] = jucator
-                    copie_matr[3][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[5][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][5] = jucator
-                    copie_matr[3][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[1][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][5] = jucator
-                    copie_matr[3][5] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            #layer3 margini
-            if self.matr[2][2] == jucator:
-                if self.matr[2][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][3] = jucator
-                    copie_matr[2][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][2] = jucator
-                    copie_matr[2][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[2][4] == jucator:
-                if self.matr[2][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][3] = jucator
-                    copie_matr[2][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[3][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][4] = jucator
-                    copie_matr[2][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[4][4] == jucator:
-                if self.matr[3][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][4] = jucator
-                    copie_matr[4][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][3] = jucator
-                    copie_matr[4][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[4][2] == jucator:
-                if self.matr[3][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][2] = jucator
-                    copie_matr[4][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][3] = jucator
-                    copie_matr[4][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            #layer3 mijloc
-            if self.matr[2][3] == jucator:
-                if self.matr[1][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[1][3] = jucator
-                    copie_matr[2][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[2][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][4] = jucator
-                    copie_matr[2][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[2][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][2] = jucator
-                    copie_matr[2][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][4] == jucator:
-                if self.matr[3][5] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][5] = jucator
-                    copie_matr[3][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[2][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][4] = jucator
-                    copie_matr[3][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][4] = jucator
-                    copie_matr[3][4] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[4][3] == jucator:
-                if self.matr[5][3] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[5][3] = jucator
-                    copie_matr[4][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][2] = jucator
-                    copie_matr[4][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][4] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][4] = jucator
-                    copie_matr[4][3] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            if self.matr[3][2] == jucator:
-                if self.matr[3][1] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[3][1] = jucator
-                    copie_matr[3][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[4][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[4][2] = jucator
-                    copie_matr[3][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-                if self.matr[2][2] == '.':
-                    copie_matr = copy.deepcopy(self.matr)
-                    copie_matr[2][2] = jucator
-                    copie_matr[3][2] = '.'
-                    l_mutari.append(Joc(copie_matr))
-
-            return l_mutari
-        return []
 
 
     #aceasta functie verifica daca elementul de coord date face parte dintr o linie sau coloana full (aceasata verif se face doar pe piese abia mutate)
@@ -603,13 +229,7 @@ class Joc:
                 break
 
         return lis
-    # . - - . - - .
-    # | . - . - . |
-    # | | . . . | |
-    # . . . _ . . .
-    # | | . . . | |
-    # | . - . - . |
-    # . - - . - - .
+
 
     #pentru o matrice data functia genereaza toate posibilitatile de a sterge o piesa de tipul jucator
     def stergeElement(self,matrice,jucator):  # jucator = simbolul jucatorului caruia i se ia o piesa
@@ -768,6 +388,80 @@ class Joc:
             else:
                 return self.nrPiese(self.__class__.JMAX) - self.nrPiese(self.__class__.JMIN)
 
+    @classmethod
+    def initializeaza(cls):
+        cls.noduri = [
+        (0, 0),#0
+        (0, 3),#1
+        (0, 6),#2
+        (3, 6),#3
+        (6, 6),#4
+        (6, 3),#5
+        (6, 0),#6
+        (3, 0),#7
+        (1, 1),#8
+        (1, 3),#9
+        (1, 5),#10
+        (3, 5),#11
+        (5, 5),#12
+        (5, 3),#13
+        (5, 1),#14
+        (3, 1),#15
+        (2, 2),#16
+        (2, 3),#17
+        (2, 4),#18
+        (3, 4),#19
+        (4, 4),#20
+        (4, 3),#21
+        (4, 2),#22
+        (3, 2) #23
+        ]
+
+        cls.muchii =[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 0),
+              (8, 10), (12, 10), (12, 14), (14, 8),
+              (16, 18), (18, 20), (20, 22), (22, 16),
+              (1, 17), (7, 23), (3, 19), (5, 21)]
+
+        cls.piesaAlba = pygame.image.load('piesaAlba.png')
+        diametruPiesa = 2 * cls.razaPiesa
+        cls.piesaAlba = pygame.transform.scale(cls.piesaAlba, (diametruPiesa, diametruPiesa))
+        cls.piesaNeagra = pygame.image.load('piesaNeagra.png')
+        cls.piesaNeagra = pygame.transform.scale(cls.piesaNeagra, (diametruPiesa, diametruPiesa))
+        cls.piesaSelectata = pygame.image.load('piesaRosie.png')
+        cls.piesaSelectata = pygame.transform.scale(cls.piesaSelectata, (diametruPiesa, diametruPiesa))
+        cls.nodPiesaSelectata = False
+        cls.coordonateNoduri = [[cls.translatie + cls.scalare * x for x in nod] for nod in cls.noduri]
+        cls.pieseAlbe = []
+        cls.nodPiesaSelectata = None
+        cls.pieseNegre = []
+
+    def locatiePiese(self, jucator):
+        lReala = []
+        lInvers = []
+        for i in range(self.lungime):
+            for j in range(self.lungime):
+                if self.matr[i][j] == jucator:
+                    lReala.append([i,j])
+                    lInvers.append([j,i])
+        return lReala, lInvers
+
+    def deseneazaEcranJoc(self,ecran):
+        ecran.fill(culoareEcran)
+        for nod in self.coordonateNoduri:
+            pygame.draw.circle(surface=ecran, color=culoareLinii, center=nod, radius=self.razaPct,
+                               width=0)  # width=0 face un cerc plin
+
+        for muchie in self.muchii:
+            p0 = self.coordonateNoduri[muchie[0]]
+            p1 = self.coordonateNoduri[muchie[1]]
+            pygame.draw.line(surface=ecran, color=culoareLinii, start_pos=p0, end_pos=p1, width=5)
+        for nod in self.pieseAlbe:
+            ecran.blit(self.piesaAlba, (nod[0] - self.razaPiesa, nod[1] - self.razaPiesa))
+        for nod in self.pieseNegre:
+            ecran.blit(self.piesaNeagra, (nod[0] - self.razaPiesa, nod[1] - self.razaPiesa))
+        # if self.nodPiesaSelectata:
+        #     ecran.blit(self.piesaSelectata, (self.nodPiesaSelectata[0] - self.razaPiesa, self.nodPiesaSelectata[1] - self.razaPiesa))
+        pygame.display.update()
 
     def sirAfisare(self):
         sir = "  | "
@@ -791,6 +485,9 @@ class Joc:
 
     def __repr__(self):
         return self.sirAfisare()
+
+
+
 # . - - . - - .
 # | . - . - . |
 # | | . . . | |
@@ -903,6 +600,464 @@ def afis_daca_final(stare_curenta):
 
     return False
 
+
+def main2():
+    raspunsV = False
+
+    while not raspunsV:
+        tip_algoritm = input("Algoritmul folosit? (raspundeti cu 1 sau 2)\n 1.Minimax\n 2.Alpha-beta\n ")
+        if tip_algoritm in ['1', '2']:
+            raspunsV = True
+        else:
+            print("Nu ati ales o varianta corecta.")
+
+    raspunsV = False
+    while not raspunsV:
+        Joc.JMIN = input("Doriti sa jucati cu a sau cu n? ").lower()
+        if (Joc.JMIN in ['a', 'n']):
+            raspunsV = True
+        else:
+            print("Raspunsul trebuie sa fie a sau n.")
+
+    Joc.JMAX = 'n' if Joc.JMIN == 'a' else 'a'
+
+    # initializare tabla
+    tablaC = Joc()
+    print("Tabla initiala")
+    print(str(tablaC))
+
+    # creare stare initiala
+    stareC = Stare(tablaC, 'a', adancimeMax)
+
+    # setari interf grafica
+    pygame.init()
+    pygame.display.set_caption('9 men`s morris')
+    # dimensiunea ferestrei in pixeli
+    # dim_celula=..
+    ecran = pygame.display.set_mode(
+        size=(700, 700))  # N *100+ (N-1)*dimensiune_linie_despartitoare (dimensiune_linie_despartitoare=1)
+    Joc.initializeaza()
+
+    de_mutat = False
+    tablaC.deseneazaEcranJoc(ecran)
+    # print(Joc.noduri)
+    # print(Joc.pieseAlbe)
+    sterge = 0
+    while True:
+        if stareC.tablaJoc.etapa == 1:
+            if(stareC.jucatorCurent == Joc.JMIN): #daca e randul tau
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN: #click
+                        pos = pygame.mouse.get_pos()
+                        # for nod in stareC.tablaJoc.noduri:
+                        for idx,nod in enumerate(Joc.coordonateNoduri):
+                            if distEuclid(pos, nod) <= Joc.razaPct:
+
+                                # aici teste liste mouse
+                                print(nod)
+
+                                if Joc.JMIN == 'a':
+                                    pieseCurente = Joc.pieseAlbe
+                                    pieseOpus =Joc.pieseNegre
+
+                                else:
+                                    pieseCurente = Joc.pieseNegre
+                                    pieseOpus = Joc.pieseAlbe
+
+                                if sterge == 0:
+                                    if nod not in Joc.pieseAlbe + Joc.pieseNegre:
+                                        pieseCurente.append(nod)
+                                        # print(nod)
+                                        linie = Joc.noduri[idx][1]
+                                        coloana = Joc.noduri[idx][0]
+                                        stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = Joc.JMIN
+                                        stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                                        # stergere de piesa nu inca !!!
+                                        if stareC.tablaJoc.contineLinCol(linie, coloana, stareC.tablaJoc.matr):
+                                            print("am notat")
+                                            sterge = 1
+                                        else:
+                                            Joc.piesePuseMin += 1
+                                            if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
+                                                Joc.etapa = 2
+
+                                            # afisarea starii jocului in urma mutarii utilizatorului
+                                            print("\nTabla dupa mutarea jucatorului")
+                                            print(str(stareC))
+
+                                            # testez daca jocul a ajuns intr-o stare finala
+                                            # si afisez un mesaj corespunzator in caz ca da
+                                            if (afis_daca_final(stareC)):
+                                                break
+
+                                            # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                                            stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                                            break
+                                if sterge == 1:
+
+                                    listaOpt = []
+                                    for i in range(7):
+                                        for j in range(7):
+                                            if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i, j,stareC.tablaJoc.matr):
+                                                listaOpt.append([Joc.translatie + Joc.scalare * j, Joc.translatie + Joc.scalare * i])
+                                    print(listaOpt)
+                                    print(Joc.pieseNegre)
+                                    if nod in listaOpt:
+                                        print("ghe")
+                                        sterge = 0
+                                        pieseOpus.remove(nod)
+                                        print("amSters" + str(nod))
+                                        print(nod)
+                                        linie = Joc.noduri[idx][1]
+                                        coloana = Joc.noduri[idx][0]
+                                        stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = '.'
+
+                                        stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                                        Joc.piesePuseMin += 1
+                                        if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
+                                            Joc.etapa = 2
+
+                                        # afisarea starii jocului in urma mutarii utilizatorului
+                                        print("\nTabla dupa mutarea jucatorului")
+                                        print(str(stareC))
+
+                                        # testez daca jocul a ajuns intr-o stare finala
+                                        # si afisez un mesaj corespunzator in caz ca da
+                                        if (afis_daca_final(stareC)):
+                                            break
+
+                                        print("ghe")
+                                        # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                                        stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                                        break
+
+
+
+            else:      # randu ai
+                print("Acum muta calculatorul cu simbolul", stareC.jucatorCurent)
+                # preiau timpul in milisecunde de dinainte de mutare
+                t_inainte = int(round(time.time() * 1000))
+
+                # stare actualizata e starea mea curenta in care am setat stare_aleasa (mutarea urmatoare)
+                if tip_algoritm == '1':
+                    stare_actualizata = min_max(stareC)
+                else:  # tip_algoritm==2
+                    stare_actualizata = alpha_beta(-500, 500, stareC)
+                stareC.tablaJoc = stare_actualizata.stareAleasa.tablaJoc  # aici se face de fapt mutarea !!!
+
+                if Joc.JMAX == 'a':
+                    real,fals = stareC.tablaJoc.locatiePiese(Joc.JMAX)
+                    Joc.pieseAlbe = []
+                    for elem in fals:
+                        Joc.pieseAlbe.append([Joc.translatie + Joc.scalare * elem[0],  Joc.translatie + Joc.scalare * elem[1]])
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMIN)
+                    Joc.pieseNegre = []
+                    for elem in fals:
+                        Joc.pieseNegre.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+                #
+                else:
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMAX)
+                    Joc.pieseNegre = []
+                    for elem in fals:
+                        Joc.pieseNegre.append([Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMIN)
+                    Joc.pieseAlbe = []
+                    for elem in fals:
+                        Joc.pieseAlbe.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+
+                stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                print("Tabla dupa mutarea calculatorului")
+                print(str(stareC))
+
+                Joc.piesePuseMax += 1
+                if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
+                    Joc.etapa = 2
+                # preiau timpul in milisecunde de dupa mutare
+                t_dupa = int(round(time.time() * 1000))
+                print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
+                # TO DO 8b
+
+                # daca s a scapat de o piesa adversa marchez acest lucru la nr total de piese
+                stareC.tablaJoc.nrPieseMin = stareC.tablaJoc.nrPieseMin - ( Joc.piesePuseMin - stareC.tablaJoc.nrPiese(Joc.JMIN) )
+
+                if (afis_daca_final(stareC)):
+                    break
+
+                # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+
+
+
+        if stareC.tablaJoc.etapa == 2:
+            if (stareC.jucatorCurent == Joc.JMIN):  # daca e randul tau
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN: #click
+                        pos = pygame.mouse.get_pos()
+                        # for nod in stareC.tablaJoc.noduri:
+                        for idx,nod in enumerate(Joc.coordonateNoduri):
+                            if distEuclid(pos, nod) <= Joc.razaPct:
+
+                                # aici teste liste mouse
+                                print(nod)
+
+                                if Joc.JMIN == 'a':
+                                    pieseCurente = Joc.pieseAlbe
+                                    pieseOpus =Joc.pieseNegre
+
+                                else:
+                                    pieseCurente = Joc.pieseNegre
+                                    pieseOpus = Joc.pieseAlbe
+
+                                if sterge == 0:
+                                    if nod in pieseCurente:
+                                        pieseCurente.append(nod)
+                                        # print(nod)
+                                        linie = Joc.noduri[idx][1]
+                                        coloana = Joc.noduri[idx][0]
+                                        stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = Joc.JMIN
+                                        stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                                        # stergere de piesa nu inca !!!
+                                        if stareC.tablaJoc.contineLinCol(linie, coloana, stareC.tablaJoc.matr):
+                                            print("am notat")
+                                            sterge = 1
+                                        else:
+                                            Joc.piesePuseMin += 1
+                                            if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
+                                                Joc.etapa = 2
+
+                                            # afisarea starii jocului in urma mutarii utilizatorului
+                                            print("\nTabla dupa mutarea jucatorului")
+                                            print(str(stareC))
+
+                                            # testez daca jocul a ajuns intr-o stare finala
+                                            # si afisez un mesaj corespunzator in caz ca da
+                                            if (afis_daca_final(stareC)):
+                                                break
+
+                                            # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                                            stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                                            break
+                                if sterge == 1:
+
+                                    listaOpt = []
+                                    for i in range(7):
+                                        for j in range(7):
+                                            if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i, j,stareC.tablaJoc.matr):
+                                                listaOpt.append([Joc.translatie + Joc.scalare * j, Joc.translatie + Joc.scalare * i])
+                                    print(listaOpt)
+                                    print(Joc.pieseNegre)
+                                    if nod in listaOpt:
+                                        print("ghe")
+                                        sterge = 0
+                                        pieseOpus.remove(nod)
+                                        print("amSters" + str(nod))
+                                        print(nod)
+                                        linie = Joc.noduri[idx][1]
+                                        coloana = Joc.noduri[idx][0]
+                                        stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = '.'
+
+                                        stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                                        Joc.piesePuseMin += 1
+                                        if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
+                                            Joc.etapa = 2
+
+                                        # afisarea starii jocului in urma mutarii utilizatorului
+                                        print("\nTabla dupa mutarea jucatorului")
+                                        print(str(stareC))
+
+                                        # testez daca jocul a ajuns intr-o stare finala
+                                        # si afisez un mesaj corespunzator in caz ca da
+                                        if (afis_daca_final(stareC)):
+                                            break
+
+                                        print("ghe")
+                                        # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                                        stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                                        break
+
+                # print("Acum muta utilizatorul cu simbolul", stareC.jucatorCurent)
+                # print("Alege piesa pe care vrei sa o muti")
+                # raspunsV = False
+                #
+                # while not raspunsV:
+                #     try:
+                #         linie = int(input("linie="))
+                #         coloana = int(input("coloana="))
+                #         if linie in range(Joc.lungime) and coloana in range(Joc.lungime):
+                #             if stareC.tablaJoc.matr[linie][coloana] == Joc.JMIN:
+                #                 if len(stareC.tablaJoc.undePotiMuta(linie,coloana)) > 0:
+                #                     raspunsV = True
+                #                 else:
+                #                     print("Piesa nu are mutari posibile")
+                #             else:
+                #                 print("Aici nu e piesa ta / ")
+                #         else:
+                #             print("nu sunt coord bune")
+                #
+                #     except ValueError:
+                #         print("Linia si coloana trebuie sa fie numere intregi")
+                # # dupa iesirea din while sigur am valide atat linia cat si coloana
+                # # gasit piesa de mutat
+                #
+                # ## aici trebuie sa afisezi unde poate fi mutata piesa
+                # if stareC.tablaJoc.nrPieseMin > 3:
+                #     print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.undePotiMuta(linie,coloana)))
+                # elif stareC.tablaJoc.nrPieseMin == 3:
+                #     print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.locLiber()))
+                # print("Alege unde")
+                # raspunsV = False
+                # while not raspunsV:
+                #     try:
+                #         linie2 = int(input("linie="))
+                #         coloana2 = int(input("coloana="))
+                #         if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
+                #             if stareC.tablaJoc.nrPieseMin > 3 and (linie2,coloana2) in stareC.tablaJoc.undePotiMuta(linie,coloana):
+                #                 raspunsV = True
+                #             elif stareC.tablaJoc.nrPieseMin <= 3 and [linie2,coloana2] in stareC.tablaJoc.locLiber():
+                #                 raspunsV = True
+                #             else:
+                #                 print("nu e o pozitie valida")
+                #         else:
+                #             print("nu sunt coord bune")
+                #
+                #     except ValueError:
+                #         print("Linia si coloana trebuie sa fie numere intregi")
+                #
+                # stareC.tablaJoc.matr[linie][coloana] = '.'
+                # stareC.tablaJoc.matr[linie2][coloana2] = Joc.JMIN
+                #
+                # # daca prin mutarea facuta ai facut o linie full
+                # if stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
+                #     listaOpt = []
+                #     for i in range(7):
+                #         for j in range(7):
+                #             if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i,j,stareC.tablaJoc.matr):
+                #                 listaOpt.append([i, j])
+                #     print("Alege sa stergi una din piesele adversarului:")
+                #     if stareC.tablaJoc.nrPieseMax > 3:
+                #         print(listaOpt)
+                #     elif stareC.tablaJoc.nrPieseMax == 3:
+                #         listaOpt = []
+                #         for i in range(7):
+                #             for j in range(7):
+                #                 if stareC.tablaJoc.matr[i][j] == Joc.JMAX:
+                #                     listaOpt.append([i, j])
+                #         print(listaOpt)
+                #
+                #     raspunsV = False
+                #     while not raspunsV:
+                #         try:
+                #             linie2 = int(input("linie="))
+                #             coloana2 = int(input("coloana="))
+                #             if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
+                #                 # if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
+                #                 if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and [linie2,coloana2] in listaOpt:
+                #                     raspunsV = True
+                #                 else:
+                #                     print("Aici nu se poate pune piesa")
+                #             else:
+                #                 print("nu sunt coord bune")
+                #
+                #         except ValueError:
+                #             print("Linia si coloana trebuie sa fie numere intregi")
+                #     # iesit din while
+                #
+                #     # eliminarea piesei adversarului
+                #     stareC.tablaJoc.matr[linie2][coloana2] = '.'
+                #
+                # # afisarea starii jocului in urma mutarii utilizatorului
+                # print("\nTabla dupa mutarea jucatorului")
+                # print(str(stareC))
+                #
+                # # testez daca jocul a ajuns intr-o stare finala
+                # # si afisez un mesaj corespunzator in caz ca da
+                # stareC.tablaJoc.nrPieseMax = stareC.tablaJoc.nrPiese(Joc.JMAX)
+                # if (afis_daca_final(stareC)):
+                #     break
+                #
+                # # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                # stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                #
+                # ## nu stiu dc faci asa nu o sa mint
+                # # print("Nr piese jucatorii ::    min = " + str(Joc.nrPieseMin) + "::    max = " + str(Joc.nrPieseMax))
+                # print("Nr piese jucatorii ::    min = " + str(stareC.tablaJoc.nrPieseMin) + "::    max = " + str(stareC.tablaJoc.nrPieseMax))
+
+            # . - - . - - .
+            # | . - . - . |
+            # | | . . . | |
+            # . . . _ . . .
+            # | | . . . | |
+            # | . - . - . |
+            # . - - . - - .
+            else:  # randu ai
+                print("Acum muta calculatorul cu simbolul", stareC.jucatorCurent)
+                # preiau timpul in milisecunde de dinainte de mutare
+                t_inainte = int(round(time.time() * 1000))
+
+                # stare actualizata e starea mea curenta in care am setat stare_aleasa (mutarea urmatoare)
+                if tip_algoritm == '1':
+                    stare_actualizata = min_max(stareC)
+                else:  # tip_algoritm==2
+                    stare_actualizata = alpha_beta(-500, 500, stareC)
+                stareC.tablaJoc = stare_actualizata.stareAleasa.tablaJoc  # aici se face de fapt mutarea !!!
+
+                if Joc.JMAX == 'a':
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMAX)
+                    Joc.pieseAlbe = []
+                    for elem in fals:
+                        Joc.pieseAlbe.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMIN)
+                    Joc.pieseNegre = []
+                    for elem in fals:
+                        Joc.pieseNegre.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+                #
+                else:
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMAX)
+                    Joc.pieseNegre = []
+                    for elem in fals:
+                        Joc.pieseNegre.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+                    real, fals = stareC.tablaJoc.locatiePiese(Joc.JMIN)
+                    Joc.pieseAlbe = []
+                    for elem in fals:
+                        Joc.pieseAlbe.append(
+                            [Joc.translatie + Joc.scalare * elem[0], Joc.translatie + Joc.scalare * elem[1]])
+
+                stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+                print("Tabla dupa mutarea calculatorului")
+                print(str(stareC))
+
+                # preiau timpul in milisecunde de dupa mutare
+                t_dupa = int(round(time.time() * 1000))
+                print("Calculatorul a \"gandit\" timp de " + str(t_dupa - t_inainte) + " milisecunde.")
+                # TO DO 8b
+
+                # daca s a scapat de o piesa adversa marchez acest lucru la nr total de piese
+                stareC.tablaJoc.nrPieseMin = stareC.tablaJoc.nrPieseMin - (
+                            Joc.piesePuseMin - stareC.tablaJoc.nrPiese(Joc.JMIN))
+
+                if (afis_daca_final(stareC)):
+                    break
+
+                # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
 
 
 def main():
@@ -1180,10 +1335,17 @@ def main():
                 stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
 
 
+
+
+
 if __name__ == "__main__":
-    main()
-
-
+    # main()
+    main2()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
     # listaLocuri = [[0, 0], [0, 3], [0, 6], [3, 6], [6, 6], [6, 3], [6, 0], [3, 0], [1, 1], [1, 3], [1, 5], [3, 5],
     #                [5, 5], [5, 3], [5, 1], [3, 1], [2, 2], [2, 3], [2, 4], [3, 4], [4, 4], [4, 3], [4, 2], [3, 2]]
     # print(len(listaLocuri))
