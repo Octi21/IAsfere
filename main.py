@@ -459,8 +459,8 @@ class Joc:
             ecran.blit(self.piesaAlba, (nod[0] - self.razaPiesa, nod[1] - self.razaPiesa))
         for nod in self.pieseNegre:
             ecran.blit(self.piesaNeagra, (nod[0] - self.razaPiesa, nod[1] - self.razaPiesa))
-        # if self.nodPiesaSelectata:
-        #     ecran.blit(self.piesaSelectata, (self.nodPiesaSelectata[0] - self.razaPiesa, self.nodPiesaSelectata[1] - self.razaPiesa))
+        if self.nodPiesaSelectata:
+            ecran.blit(self.piesaSelectata, (self.nodPiesaSelectata[0] - self.razaPiesa, self.nodPiesaSelectata[1] - self.razaPiesa))
         pygame.display.update()
 
     def sirAfisare(self):
@@ -638,12 +638,17 @@ def main2():
         size=(700, 700))  # N *100+ (N-1)*dimensiune_linie_despartitoare (dimensiune_linie_despartitoare=1)
     Joc.initializeaza()
 
-    de_mutat = False
+    coordPiesaSel = False
     tablaC.deseneazaEcranJoc(ecran)
     # print(Joc.noduri)
     # print(Joc.pieseAlbe)
     sterge = 0
+    var = 0
+    var2 = 0
+    # nodPiesaSelectata = False
     while True:
+        if var2 == True:
+            break
         if stareC.tablaJoc.etapa == 1:
             if(stareC.jucatorCurent == Joc.JMIN): #daca e randul tau
 
@@ -717,6 +722,12 @@ def main2():
                                         coloana = Joc.noduri[idx][0]
                                         stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = '.'
 
+                                        # daca s a scapat de o piesa adversa marchez acest lucru la nr total de piese
+                                        # stareC.tablaJoc.nrPieseMax = stareC.tablaJoc.nrPieseMax - ( Joc.piesePuseMax - stareC.tablaJoc.nrPiese(Joc.JMAX))
+                                        print(str(Joc.nrPieseMax) + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=")
+                                        Joc.nrPieseMax = Joc.nrPieseMax - ( Joc.piesePuseMax - stareC.tablaJoc.nrPiese(Joc.JMAX)) + var
+                                        var+= 1
+                                        print(str(Joc.nrPieseMax) + "======================================================================")
                                         stareC.tablaJoc.deseneazaEcranJoc(ecran)
 
                                         Joc.piesePuseMin += 1
@@ -803,6 +814,9 @@ def main2():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
+                    if var == True:
+                        var2 = True
+                        break
                     if event.type == pygame.MOUSEBUTTONDOWN: #click
                         pos = pygame.mouse.get_pos()
                         # for nod in stareC.tablaJoc.noduri:
@@ -821,42 +835,83 @@ def main2():
                                     pieseOpus = Joc.pieseAlbe
 
                                 if sterge == 0:
-                                    if nod in pieseCurente:
-                                        pieseCurente.append(nod)
-                                        # print(nod)
-                                        linie = Joc.noduri[idx][1]
-                                        coloana = Joc.noduri[idx][0]
-                                        stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = Joc.JMIN
+                                    if nod not in  Joc.pieseAlbe + Joc.pieseNegre:
+                                        if Joc.nodPiesaSelectata:
+                                            linie = coordPiesaSel[0]
+                                            coloana = coordPiesaSel[1]
+                                            if stareC.tablaJoc.nrPieseMin > 3:
+                                                listaOpt = stareC.tablaJoc.undePotiMuta(linie,coloana)
+                                                print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.undePotiMuta(linie,coloana)))
+                                            elif stareC.tablaJoc.nrPieseMin == 3:
+                                                listaOpt = stareC.tablaJoc.locLiber()
+                                                print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.locLiber()))
+
+                                            print([Joc.noduri[idx][1], Joc.noduri[idx][0]])
+                                            # muti piesa
+                                            if ((Joc.noduri[idx][1],Joc.noduri[idx][0]) in listaOpt) or (stareC.tablaJoc.nrPieseMin == 3 and [Joc.noduri[idx][1],Joc.noduri[idx][0]] in listaOpt):
+                                                pieseCurente.remove(Joc.nodPiesaSelectata)
+                                                pieseCurente.append(nod)
+
+                                                # print(nod)
+                                                # linie = Joc.noduri[idx][1]
+                                                # coloana = Joc.noduri[idx][0]
+                                                stareC.tablaJoc.matr[Joc.noduri[idx][1]][Joc.noduri[idx][0]] = Joc.JMIN
+                                                stareC.tablaJoc.matr[linie][coloana] = '.'
+
+                                                Joc.nodPiesaSelectata = False
+                                                coordPiesaSel = False
+                                                stareC.tablaJoc.deseneazaEcranJoc(ecran)
+
+
+
+
+                                                # stergere de piesa nu inca !!!
+                                                if stareC.tablaJoc.contineLinCol(Joc.noduri[idx][1], Joc.noduri[idx][0], stareC.tablaJoc.matr):
+                                                    print("am notat")
+                                                    sterge = 1
+                                                else:
+
+
+                                                    # afisarea starii jocului in urma mutarii utilizatorului
+                                                    print("\nTabla dupa mutarea jucatorului")
+                                                    print(str(stareC))
+
+                                                    # testez daca jocul a ajuns intr-o stare finala
+                                                    # si afisez un mesaj corespunzator in caz ca da
+                                                    if (afis_daca_final(stareC)):
+                                                        break
+
+                                                    # S-a realizat o mutare. Schimb jucatorul cu cel opus
+                                                    stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
+                                                    break
+                                    # daca apesi pe o piesa
+                                    else:
+                                        #apesi pe una din piesele tale
+                                        if nod in pieseCurente:
+                                            if Joc.nodPiesaSelectata == nod:
+                                                Joc.nodPiesaSelectata = False
+                                                coordPiesaSel = False
+                                            else:
+                                                Joc.nodPiesaSelectata = nod
+                                                coordPiesaSel = [Joc.noduri[idx][1],Joc.noduri[idx][0]]
                                         stareC.tablaJoc.deseneazaEcranJoc(ecran)
 
-                                        # stergere de piesa nu inca !!!
-                                        if stareC.tablaJoc.contineLinCol(linie, coloana, stareC.tablaJoc.matr):
-                                            print("am notat")
-                                            sterge = 1
-                                        else:
-                                            Joc.piesePuseMin += 1
-                                            if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
-                                                Joc.etapa = 2
-
-                                            # afisarea starii jocului in urma mutarii utilizatorului
-                                            print("\nTabla dupa mutarea jucatorului")
-                                            print(str(stareC))
-
-                                            # testez daca jocul a ajuns intr-o stare finala
-                                            # si afisez un mesaj corespunzator in caz ca da
-                                            if (afis_daca_final(stareC)):
-                                                break
-
-                                            # S-a realizat o mutare. Schimb jucatorul cu cel opus
-                                            stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
-                                            break
                                 if sterge == 1:
-
-                                    listaOpt = []
-                                    for i in range(7):
-                                        for j in range(7):
-                                            if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i, j,stareC.tablaJoc.matr):
-                                                listaOpt.append([Joc.translatie + Joc.scalare * j, Joc.translatie + Joc.scalare * i])
+                                    print("nr piese negre === " + str(stareC.tablaJoc.nrPieseMax))
+                                    # if stareC.tablaJoc.nrPieseMax > 3:
+                                    if Joc.nrPieseMax > 3:
+                                        listaOpt = []
+                                        for i in range(7):
+                                            for j in range(7):
+                                                if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i, j,stareC.tablaJoc.matr):
+                                                    listaOpt.append([Joc.translatie + Joc.scalare * j, Joc.translatie + Joc.scalare * i])
+                                    # elif stareC.tablaJoc.nrPieseMax == 3:
+                                    if Joc.nrPieseMax == 3:
+                                        listaOpt = []
+                                        for i in range(7):
+                                            for j in range(7):
+                                                if stareC.tablaJoc.matr[i][j] == Joc.JMAX:
+                                                    listaOpt.append([Joc.translatie + Joc.scalare * j, Joc.translatie + Joc.scalare * i])
                                     print(listaOpt)
                                     print(Joc.pieseNegre)
                                     if nod in listaOpt:
@@ -871,17 +926,16 @@ def main2():
 
                                         stareC.tablaJoc.deseneazaEcranJoc(ecran)
 
-                                        Joc.piesePuseMin += 1
-                                        if Joc.piesePuseMin == 9 and Joc.piesePuseMax == 9:
-                                            Joc.etapa = 2
 
                                         # afisarea starii jocului in urma mutarii utilizatorului
                                         print("\nTabla dupa mutarea jucatorului")
                                         print(str(stareC))
-
+                                        # stareC.tablaJoc.nrPieseMax = stareC.tablaJoc.nrPiese(Joc.JMAX)
+                                        Joc.nrPieseMax = stareC.tablaJoc.nrPiese(Joc.JMAX)
                                         # testez daca jocul a ajuns intr-o stare finala
                                         # si afisez un mesaj corespunzator in caz ca da
                                         if (afis_daca_final(stareC)):
+                                            var = True
                                             break
 
                                         print("ghe")
@@ -889,112 +943,6 @@ def main2():
                                         stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
                                         break
 
-                # print("Acum muta utilizatorul cu simbolul", stareC.jucatorCurent)
-                # print("Alege piesa pe care vrei sa o muti")
-                # raspunsV = False
-                #
-                # while not raspunsV:
-                #     try:
-                #         linie = int(input("linie="))
-                #         coloana = int(input("coloana="))
-                #         if linie in range(Joc.lungime) and coloana in range(Joc.lungime):
-                #             if stareC.tablaJoc.matr[linie][coloana] == Joc.JMIN:
-                #                 if len(stareC.tablaJoc.undePotiMuta(linie,coloana)) > 0:
-                #                     raspunsV = True
-                #                 else:
-                #                     print("Piesa nu are mutari posibile")
-                #             else:
-                #                 print("Aici nu e piesa ta / ")
-                #         else:
-                #             print("nu sunt coord bune")
-                #
-                #     except ValueError:
-                #         print("Linia si coloana trebuie sa fie numere intregi")
-                # # dupa iesirea din while sigur am valide atat linia cat si coloana
-                # # gasit piesa de mutat
-                #
-                # ## aici trebuie sa afisezi unde poate fi mutata piesa
-                # if stareC.tablaJoc.nrPieseMin > 3:
-                #     print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.undePotiMuta(linie,coloana)))
-                # elif stareC.tablaJoc.nrPieseMin == 3:
-                #     print("Piesa de pe poz " + str([linie,coloana]) +" are mutarile: " + str(stareC.tablaJoc.locLiber()))
-                # print("Alege unde")
-                # raspunsV = False
-                # while not raspunsV:
-                #     try:
-                #         linie2 = int(input("linie="))
-                #         coloana2 = int(input("coloana="))
-                #         if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
-                #             if stareC.tablaJoc.nrPieseMin > 3 and (linie2,coloana2) in stareC.tablaJoc.undePotiMuta(linie,coloana):
-                #                 raspunsV = True
-                #             elif stareC.tablaJoc.nrPieseMin <= 3 and [linie2,coloana2] in stareC.tablaJoc.locLiber():
-                #                 raspunsV = True
-                #             else:
-                #                 print("nu e o pozitie valida")
-                #         else:
-                #             print("nu sunt coord bune")
-                #
-                #     except ValueError:
-                #         print("Linia si coloana trebuie sa fie numere intregi")
-                #
-                # stareC.tablaJoc.matr[linie][coloana] = '.'
-                # stareC.tablaJoc.matr[linie2][coloana2] = Joc.JMIN
-                #
-                # # daca prin mutarea facuta ai facut o linie full
-                # if stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
-                #     listaOpt = []
-                #     for i in range(7):
-                #         for j in range(7):
-                #             if stareC.tablaJoc.matr[i][j] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(i,j,stareC.tablaJoc.matr):
-                #                 listaOpt.append([i, j])
-                #     print("Alege sa stergi una din piesele adversarului:")
-                #     if stareC.tablaJoc.nrPieseMax > 3:
-                #         print(listaOpt)
-                #     elif stareC.tablaJoc.nrPieseMax == 3:
-                #         listaOpt = []
-                #         for i in range(7):
-                #             for j in range(7):
-                #                 if stareC.tablaJoc.matr[i][j] == Joc.JMAX:
-                #                     listaOpt.append([i, j])
-                #         print(listaOpt)
-                #
-                #     raspunsV = False
-                #     while not raspunsV:
-                #         try:
-                #             linie2 = int(input("linie="))
-                #             coloana2 = int(input("coloana="))
-                #             if linie2 in range(Joc.lungime) and coloana2 in range(Joc.lungime):
-                #                 # if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and not stareC.tablaJoc.contineLinCol(linie2,coloana2,stareC.tablaJoc.matr):
-                #                 if stareC.tablaJoc.matr[linie2][coloana2] == Joc.JMAX and [linie2,coloana2] in listaOpt:
-                #                     raspunsV = True
-                #                 else:
-                #                     print("Aici nu se poate pune piesa")
-                #             else:
-                #                 print("nu sunt coord bune")
-                #
-                #         except ValueError:
-                #             print("Linia si coloana trebuie sa fie numere intregi")
-                #     # iesit din while
-                #
-                #     # eliminarea piesei adversarului
-                #     stareC.tablaJoc.matr[linie2][coloana2] = '.'
-                #
-                # # afisarea starii jocului in urma mutarii utilizatorului
-                # print("\nTabla dupa mutarea jucatorului")
-                # print(str(stareC))
-                #
-                # # testez daca jocul a ajuns intr-o stare finala
-                # # si afisez un mesaj corespunzator in caz ca da
-                # stareC.tablaJoc.nrPieseMax = stareC.tablaJoc.nrPiese(Joc.JMAX)
-                # if (afis_daca_final(stareC)):
-                #     break
-                #
-                # # S-a realizat o mutare. Schimb jucatorul cu cel opus
-                # stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
-                #
-                # ## nu stiu dc faci asa nu o sa mint
-                # # print("Nr piese jucatorii ::    min = " + str(Joc.nrPieseMin) + "::    max = " + str(Joc.nrPieseMax))
-                # print("Nr piese jucatorii ::    min = " + str(stareC.tablaJoc.nrPieseMin) + "::    max = " + str(stareC.tablaJoc.nrPieseMax))
 
             # . - - . - - .
             # | . - . - . |
@@ -1364,9 +1312,6 @@ if __name__ == "__main__":
     #
     # l = [[3,2],[2,1],[4,5]]
     # print(set(l))
-
-
-    ## scenariu y
 
 
 # . - - . - - .
