@@ -1,3 +1,24 @@
+#1 linia 644 in jos  /  cine muta 1083 1300  /  daca final linia 621
+
+#2 linia 633 pt dificultate
+
+#3 666 - 689 initializari
+
+#4 674 - 683 doar init pt interfata functii fol 422 478
+
+#5 298 - functia de generare a mutarilor
+
+#6 700 859 mutare utilizator pt etapele jocului
+
+#7 88 stabilire stari finale
+
+#8 403 414
+
+#9 -
+
+#10 703 862 1342
+
+
 
 import copy
 import time
@@ -69,6 +90,12 @@ class Joc:
             print("AI castiga ")
             return self.JMAX
         if self.nrPieseMax == 2:
+            print("Tu castigi")
+            return self.JMIN
+        if self.estiblocat(self.JMIN) and self.etapa == 2:
+            print("AI castiga ")
+            return self.JMAX
+        if self.estiblocat(self.JMAX) and self.etapa == 2:
             print("Tu castigi")
             return self.JMIN
         return False
@@ -231,6 +258,15 @@ class Joc:
         return lis
 
 
+    # cand nu mai ai mutari posibile ca sa termini jocul !! folosit la final
+    def estiblocat(self, jucator):  # jucator = simbolul jucatorului caruia i se ia o piesa
+        list, fals = self.locatiePiese(jucator)
+        for piesa in list:
+            if len(self.undePotiMuta(piesa[0], piesa[1])) != 0:
+                return False
+        return True
+
+
     #pentru o matrice data functia genereaza toate posibilitatile de a sterge o piesa de tipul jucator
     def stergeElement(self,matrice,jucator):  # jucator = simbolul jucatorului caruia i se ia o piesa
         l_matrice = []
@@ -257,6 +293,7 @@ class Joc:
                 if self.matr[i][j] == '.':
                     l.append([i,j])
         return l
+
 
     def mutari(self, jucator):  # jucator = simbolul jucatorului care muta
         if self.etapa == 1:
@@ -605,6 +642,17 @@ def main2():
     raspunsV = False
 
     while not raspunsV:
+        adancimeMax = input("Dificultate: 2,3,4\n ")
+        if adancimeMax in ['2', '3','4']:
+            raspunsV = True
+            adancimeMax = int(adancimeMax)
+        else:
+            print("Nu ati ales o varianta corecta.")
+
+
+    raspunsV = False
+
+    while not raspunsV:
         tip_algoritm = input("Algoritmul folosit? (raspundeti cu 1 sau 2)\n 1.Minimax\n 2.Alpha-beta\n ")
         if tip_algoritm in ['1', '2']:
             raspunsV = True
@@ -631,7 +679,7 @@ def main2():
 
     # setari interf grafica
     pygame.init()
-    pygame.display.set_caption('9 men`s morris')
+    pygame.display.set_caption('9 men`s morris -- Octavian Chiriac')
     # dimensiunea ferestrei in pixeli
     # dim_celula=..
     ecran = pygame.display.set_mode(
@@ -651,7 +699,6 @@ def main2():
             break
         if stareC.tablaJoc.etapa == 1:
             if(stareC.jucatorCurent == Joc.JMIN): #daca e randul tau
-
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -713,7 +760,7 @@ def main2():
                                     print(listaOpt)
                                     print(Joc.pieseNegre)
                                     if nod in listaOpt:
-                                        print("ghe")
+                                        # print("ghe")
                                         sterge = 0
                                         pieseOpus.remove(nod)
                                         print("amSters" + str(nod))
@@ -810,13 +857,14 @@ def main2():
 
         if stareC.tablaJoc.etapa == 2:
             if (stareC.jucatorCurent == Joc.JMIN):  # daca e randul tau
+
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
-                    if var == True:
-                        var2 = True
-                        break
+                    # if var == True:
+                    #     var2 = True
+                    #     break
                     if event.type == pygame.MOUSEBUTTONDOWN: #click
                         pos = pygame.mouse.get_pos()
                         # for nod in stareC.tablaJoc.noduri:
@@ -938,7 +986,7 @@ def main2():
                                             var = True
                                             break
 
-                                        print("ghe")
+                                        # print("ghe")
                                         # S-a realizat o mutare. Schimb jucatorul cu cel opus
                                         stareC.jucatorCurent = Joc.jucator_opus(stareC.jucatorCurent)
                                         break
